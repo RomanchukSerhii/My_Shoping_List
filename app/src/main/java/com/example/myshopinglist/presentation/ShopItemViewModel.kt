@@ -16,11 +16,11 @@ class ShopItemViewModel : ViewModel() {
     private val editShopItemUseCase = EditShopItemUseCase(repository)
     private val getShopItemUseCase = GetShopItemUseCase(repository)
 
-    private val _errorInputName = MutableLiveData<Boolean>()
+    private val _errorInputName = MutableLiveData(false)
     val errorInputName: LiveData<Boolean>
         get() = _errorInputName
 
-    private val _errorInputCount = MutableLiveData<Boolean>()
+    private val _errorInputCount = MutableLiveData(false)
     val errorInputCount: LiveData<Boolean>
         get() = _errorInputCount
 
@@ -29,7 +29,7 @@ class ShopItemViewModel : ViewModel() {
         get() = _shopItem
 
     private val _shouldCloseScreen = MutableLiveData<Unit>()
-    val methodDone: LiveData<Unit>
+    val shouldCloseScreen: LiveData<Unit>
         get() = _shouldCloseScreen
 
     fun addShopItem(inputName: String?, inputCount: String?) {
