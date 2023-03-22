@@ -3,9 +3,7 @@ package com.example.myshopinglist.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -13,10 +11,9 @@ import com.example.myshopinglist.R
 import com.example.myshopinglist.databinding.ActivityShopItemBinding
 import com.example.myshopinglist.domain.ShopItem
 
-class ShopItemActivity : AppCompatActivity() {
+class ShopItemActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
     private lateinit var binding: ActivityShopItemBinding
     private lateinit var viewModel: ShopItemViewModel
-    private lateinit var onBackPressedCallback: OnBackPressedCallback
 
     private var screenMode = MODE_UNKNOWN
     private var shopItemId = ShopItem.UNDEFINED_ID
@@ -81,5 +78,9 @@ class ShopItemActivity : AppCompatActivity() {
             intent.putExtra(EXTRA_SHOP_ITEM_ID, shopItemId)
             return intent
         }
+    }
+
+    override fun onEditingFinished() {
+        finish()
     }
 }

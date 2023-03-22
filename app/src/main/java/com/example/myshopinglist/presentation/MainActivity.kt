@@ -3,6 +3,7 @@ package com.example.myshopinglist.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
@@ -12,7 +13,7 @@ import com.example.myshopinglist.R
 import com.example.myshopinglist.presentation.adapter.ShopListAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener {
     private lateinit var viewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
     private lateinit var rvShopList: RecyclerView
@@ -133,5 +134,10 @@ class MainActivity : AppCompatActivity() {
         fun newIntent(context: Context): Intent {
             return Intent(context, MainActivity::class.java)
         }
+    }
+
+    override fun onEditingFinished() {
+        Toast.makeText(this@MainActivity, "Success", Toast.LENGTH_SHORT).show()
+        supportFragmentManager.popBackStack()
     }
 }
