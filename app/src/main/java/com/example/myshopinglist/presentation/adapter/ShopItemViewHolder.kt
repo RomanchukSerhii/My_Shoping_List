@@ -2,15 +2,28 @@ package com.example.myshopinglist.presentation.adapter
 
 import android.view.View
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myshopinglist.R
+import com.example.myshopinglist.databinding.ItemShopDisabledBinding
+import com.example.myshopinglist.databinding.ItemShopEnabledBinding
 import com.example.myshopinglist.domain.ShopItem
 
-class ShopItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class ShopItemViewHolder(
+    private val binding: ViewDataBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
     fun bind(shopItem: ShopItem) {
-        val tvName = itemView.findViewById<TextView>(R.id.tv_name)
-        val tvCount = itemView.findViewById<TextView>(R.id.tv_count)
-        tvName.text = shopItem.name
-        tvCount.text = shopItem.count.toString()
+        when (binding) {
+            is ItemShopDisabledBinding -> {
+                binding.tvName.text = shopItem.name
+                binding.tvCount.text = shopItem.count.toString()
+            }
+            is ItemShopEnabledBinding -> {
+                binding.tvName.text = shopItem.name
+                binding.tvCount.text = shopItem.count.toString()
+            }
+        }
     }
 }
