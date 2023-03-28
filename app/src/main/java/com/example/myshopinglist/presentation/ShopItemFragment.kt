@@ -22,7 +22,9 @@ class ShopItemFragment : Fragment() {
     private val binding: FragmentShopItemBinding
         get() = _binding ?: throw RuntimeException("FragmentShopItemBinding == null")
 
-    private lateinit var viewModel: ShopItemViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(this)[ShopItemViewModel::class.java]
+    }
     private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     private var screenMode: String = MODE_UNKNOWN
@@ -53,7 +55,8 @@ class ShopItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         addTextChangedListeners()
         launchRightMode()
         observeViewModels()
@@ -72,88 +75,54 @@ class ShopItemFragment : Fragment() {
     }
 
     private fun launchAddMode() {
-        binding.apply {
-            saveButton.setOnClickListener {
-                viewModel.addShopItem(etName.text.toString(), etCount.text.toString())
-            }
+        binding.saveButton.setOnClickListener {
+            viewModel.addShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
         }
     }
 
     private fun launchEditMode() {
-        binding.apply {
-            viewModel.getShopItem(shopItemId)
-            viewModel.shopItem.observe(viewLifecycleOwner) { shopItem ->
-                etName.setText(shopItem.name)
-                etCount.setText(shopItem.count.toString())
-            }
-            saveButton.setOnClickListener {
-                viewModel.editShopItem(etName.text?.toString(), etCount.text?.toString())
-            }
+        viewModel.getShopItem(shopItemId)
+        binding.saveButton.setOnClickListener {
+            viewModel.editShopItem(binding.etName.text?.toString(), binding.etCount.text?.toString())
         }
     }
 
     private fun observeViewModels() {
-        binding.apply {
-            viewModel.errorInputName.observe(viewLifecycleOwner) { isHasError ->
-                if (isHasError) {
-                    etName.requestFocus()
-                    etName.error = getString(R.string.field_error)
-                } else {
-                    etName.error = null
-                }
-            }
-
-            viewModel.errorInputCount.observe(viewLifecycleOwner) { isHasError ->
-                if (isHasError) {
-                    etCount.requestFocus()
-                    etCount.error = getString(R.string.field_error)
-                } else {
-                    etCount.error = null
-                }
-            }
-
-            viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
-                onEditingFinishedListener.onEditingFinished()
-            }
+        viewModel.shouldCloseScreen.observe(viewLifecycleOwner) {
+            onEditingFinishedListener.onEditingFinished()
         }
     }
 
     private fun addTextChangedListeners() {
-        binding.apply {
-            etName.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+        binding.etName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {}
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    viewModel.resetInputNameError()
-                }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetInputNameError()
+            }
 
-                override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
-            })
+        binding.etCount.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {}
 
-            etCount.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetInputCountError()
+            }
 
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    viewModel.resetInputCountError()
-                }
-
-                override fun afterTextChanged(s: Editable?) {}
-
-            })
-        }
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
     private fun parseParams() {
