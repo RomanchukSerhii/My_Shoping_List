@@ -33,6 +33,10 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <provider
+            android:authorities="com.example.myshopinglist"
+            android:name=".data.ShopListProvider"
+            android:exported="true"/>
     </application>
 
 </manifest>
