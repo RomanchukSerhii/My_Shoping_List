@@ -2,8 +2,6 @@ package com.example.myshopinglist.data
 
 import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.example.myshopinglist.domain.ShopItem
 import com.example.myshopinglist.domain.ShopListRepository
