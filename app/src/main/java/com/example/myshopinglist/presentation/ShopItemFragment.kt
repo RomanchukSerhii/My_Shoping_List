@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.myshopinglist.R
 import com.example.myshopinglist.databinding.FragmentShopItemBinding
 import com.example.myshopinglist.domain.ShopItem
+import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 
 class ShopItemFragment : Fragment() {
@@ -22,17 +23,27 @@ class ShopItemFragment : Fragment() {
     private val binding: FragmentShopItemBinding
         get() = _binding ?: throw RuntimeException("FragmentShopItemBinding == null")
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
     private val viewModel by lazy {
-        ViewModelProvider(this)[ShopItemViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[ShopItemViewModel::class.java]
     }
+
+    private val component by lazy {
+        (requireActivity().application as App).component
+    }
+
     private lateinit var onEditingFinishedListener: OnEditingFinishedListener
 
     private var screenMode: String = MODE_UNKNOWN
     private var shopItemId: Int = ShopItem.UNDEFINED_ID
 
     override fun onAttach(context: Context) {
+        component.inject(this)
         super.onAttach(context)
         if (context is OnEditingFinishedListener) {
+
             onEditingFinishedListener = context
         } else {
             throw RuntimeException("Activity must implement OnEditingFinishedListener")

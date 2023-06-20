@@ -13,17 +13,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myshopinglist.R
 import com.example.myshopinglist.databinding.ActivityMainBinding
 import com.example.myshopinglist.presentation.adapter.ShopListAdapter
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener  {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainViewModel
     private lateinit var shopListAdapter: ShopListAdapter
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+    }
+    private val component by lazy {
+        (application as App).component
+    }
     private var shopItemContainer: FragmentContainerView? = null
     private var isLandscapeMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -34,7 +44,6 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
             launchLandscapeMode()
         }
 
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setupRecyclerView()
         observeViewModel()
         setupListeners()
