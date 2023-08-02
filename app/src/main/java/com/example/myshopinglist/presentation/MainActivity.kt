@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentContainerView
@@ -12,11 +13,16 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myshopinglist.R
 import com.example.myshopinglist.databinding.ActivityMainBinding
+import com.example.myshopinglist.domain.ShopItem
 import com.example.myshopinglist.presentation.adapter.ShopListAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedListener  {
 
+    private val scope = CoroutineScope(Dispatchers.IO)
     private lateinit var binding: ActivityMainBinding
     private lateinit var shopListAdapter: ShopListAdapter
 
@@ -47,14 +53,39 @@ class MainActivity : AppCompatActivity(), ShopItemFragment.OnEditingFinishedList
         setupRecyclerView()
         observeViewModel()
         setupListeners()
-        contentResolver.query(
-            Uri.parse("content://com.example.myshopinglist/shop_items"),
-            null,
-            null,
-            null,
-            null,
-            null,
-        )
+        getDbFromContentProvider()
+    }
+
+    private fun getDbFromContentProvider() {
+        scope.launch {
+            val cursor = contentResolver.query(
+                Uri.parse("content://com.example.myshopinglist/shop_items"),
+                null,
+                null,
+                null,
+                null,
+                null,
+            )
+
+            while (cursor?.moveToNext() == true) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val count = cursor.getInt(cursor.getColumnIndexOrThrow("count"))
+                val enabled = cursor.getInt(cursor.getColumnIndexOrThrow("enabled")) > 0
+
+                val shopItem = ShopItem(
+                    id = id,
+                    name = name,
+                    count = count,
+                    enabled = enabled
+                )
+
+                Log.d("MainActivity", shopItem.toString())
+            }
+
+            cursor?.close()
+        }
+
     }
 
     private fun launchLandscapeMode() {
