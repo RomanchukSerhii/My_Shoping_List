@@ -1,7 +1,9 @@
 package com.example.myshopinglist.presentation
 
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +17,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.myshopinglist.R
 import com.example.myshopinglist.databinding.FragmentShopItemBinding
 import com.example.myshopinglist.domain.ShopItem
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.concurrent.fixedRateTimer
 
@@ -22,6 +27,8 @@ class ShopItemFragment : Fragment() {
     private var _binding: FragmentShopItemBinding? = null
     private val binding: FragmentShopItemBinding
         get() = _binding ?: throw RuntimeException("FragmentShopItemBinding == null")
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -87,7 +94,18 @@ class ShopItemFragment : Fragment() {
 
     private fun launchAddMode() {
         binding.saveButton.setOnClickListener {
-            viewModel.addShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
+//            viewModel.addShopItem(binding.etName.text.toString(), binding.etCount.text.toString())
+            scope.launch {
+                context?.contentResolver?.insert(
+                    Uri.parse("content://com.example.myshopinglist/shop_items"),
+                    ContentValues().apply {
+                        put("id", 0)
+                        put("name", binding.etName.text?.toString())
+                        put("count", binding.etCount.text?.toString()?.toInt())
+                        put("enabled", true)
+                    }
+                )
+            }
         }
     }
 

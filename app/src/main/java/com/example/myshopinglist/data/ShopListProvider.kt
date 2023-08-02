@@ -6,6 +6,7 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
+import com.example.myshopinglist.domain.ShopItem
 import com.example.myshopinglist.presentation.App
 import javax.inject.Inject
 
@@ -13,6 +14,9 @@ class ShopListProvider : ContentProvider() {
 
     @Inject
     lateinit var shopListDao: ShopListDao
+
+    @Inject
+    lateinit var mapper: ShopListMapper
 
     private val component by lazy {
         (context as App).component
@@ -48,7 +52,25 @@ class ShopListProvider : ContentProvider() {
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        TODO("Not yet implemented")
+        when (uriMatcher.match(uri)) {
+            GET_SHOP_ITEMS_QUERY -> {
+                if (values == null) return null
+                val id = values.getAsInteger("id")
+                val name = values.getAsString("name")
+                val count = values.getAsInteger("count")
+                val enabled = values.getAsBoolean("enabled")
+
+                val shopItem = ShopItem(
+                    id = id,
+                    name = name,
+                    count = count,
+                    enabled = enabled
+                )
+
+                shopListDao.addShopItemSync(mapper.mapEntityToDbModel(shopItem))
+            }
+        }
+        return null
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
